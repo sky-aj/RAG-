@@ -1,0 +1,16 @@
+# Local credentials and protected migration snapshots.
+.env
+.env.*
+!.env.example
+.migration-backup/
+
+# Runtime data includes uploaded documents, model evidence and configuration backups.
+backend/data/*
+!backend/data/samples/
+!backend/data/samples/**
+backend/.venv/
+backend/.pytest_cache/
+**/__pycache__/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite-*.log

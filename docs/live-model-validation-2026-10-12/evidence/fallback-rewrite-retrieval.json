@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-12T10:27:37.988192+00:00",
+  "diagnostics": {
+    "below_threshold": 0,
+    "context_budget": 6000,
+    "context_dropped": 0,
+    "context_tokens": 1713,
+    "context_used": 10,
+    "fused": 16,
+    "hybrid": true,
+    "keyword_candidates": 24,
+    "keyword_top_n": 40,
+    "merged_from_hits": 12,
+    "notes": [
+      "查询改写生效：原问题 + 2 条子查询并行召回",
+      "主模型暂不可用（HTTP 503 (controlled_gateway_unavailable)），已切换至 glm-4-flash，正在重新生成"
+    ],
+    "overflow": 9,
+    "per_document": 3,
+    "rerank_requested": false,
+    "rerank_used": false,
+    "returned": 12,
+    "route_candidates": 138,
+    "subqueries": 3,
+    "threshold": 0.35,
+    "vector_candidates": 25,
+    "vector_kept": 25,
+    "vector_top_n": 80
+  },
+  "citations": 10,
+  "global_switch_enabled": false
+}

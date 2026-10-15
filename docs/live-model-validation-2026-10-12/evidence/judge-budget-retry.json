@@ -1,0 +1,59 @@
+{
+  "at": "2026-10-12T10:48:18.910484+00:00",
+  "notices": [
+    "deepseek-v4-flash 裁判达到 256 token 输出预算，已用 512 重新判分一次"
+  ],
+  "attempts": [
+    {
+      "model": "deepseek-v4-flash",
+      "provider": "sub-coco",
+      "max_tokens": 256,
+      "case_ids": [],
+      "usage": {
+        "completion_tokens": 256,
+        "prompt_tokens": 72,
+        "total_tokens": 328,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 256,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        }
+      },
+      "finish_reasons": [
+        "length"
+      ]
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "provider": "sub-coco",
+      "max_tokens": 512,
+      "case_ids": [],
+      "usage": {
+        "completion_tokens": 512,
+        "prompt_tokens": 72,
+        "total_tokens": 584,
+        "completion_tokens_details": {
+          "accepted_prediction_tokens": null,
+          "audio_tokens": null,
+          "reasoning_tokens": 512,
+          "rejected_prediction_tokens": null
+        },
+        "prompt_tokens_details": {
+          "audio_tokens": null,
+          "cached_tokens": 0
+        }
+      },
+      "finish_reasons": [
+        "length"
+      ]
+    }
+  ],
+  "finish_reason": "length",
+  "characters": 0,
+  "meaning": "Deliberately insufficient small budget; exactly one real expanded retry, no infinite retry or fake completed score."
+}

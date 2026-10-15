@@ -1,0 +1,1389 @@
+{
+  "at": "2026-10-12T10:32:52.110206+00:00",
+  "created_at": "2026-10-12T10:30:28.799960+00:00",
+  "dataset_count": 2,
+  "notes": [],
+  "ok": true,
+  "path": "E:\\Desktop\\rag指标\\backend\\data\\tmp\\live-validation-20261012-181440\\eval\\latest.json",
+  "variants": [
+    {
+      "error": "",
+      "name": "当前配置",
+      "params": {
+        "hybrid": true,
+        "rerank": null
+      },
+      "per_case": [
+        {
+          "actual_model": "deepseek-v4-flash",
+          "answer": "## 429 频繁出现的原因与处理\n\n- **常见原因**：同一个 API Key 被多个环境共用，导致请求量叠加触发限流。建议按环境拆分 Key【片段 1】【片段 2】。\n- **限流机制背景**：对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发 20；额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头【片段 3】【片段 4】。\n\n## 相关补充信息\n\n- **额度恢复时间**：滑动窗口是随请求时间推移连续释放额度，不是整点重置，所以额度会逐步恢复而非某一时刻集中恢复【片段 1】【片段 2】。\n- **重试时机**：429 响应一定带 `Retry-After` 响应头，单位为秒，表示最早可重试的时间【片段 3】【片段 4】【片段 2】。\n- **突发流量**：允许短时超出到 1.5 倍（即 900 次/分钟），持续不超过 10 秒，之后立即拒绝【片段 2】【片段 4】。\n\n## 关于「怎么处理」的说明\n\n给定资料中针对 429 的处理建议只有一条：**按环境拆分 API Key**【片段 1】【片段 2】。其余关于提额自助申请、审批生效时间等内容只涉及企业版提额流程，并非针对 429 频繁出现的直接处置措施。如果你的问题是别的处理方式（例如降级、排队、客户端节流策略），给定资料里没有这个信息，缺失的是具体的客户端侧限流应对方案。",
+          "case_id": "case-001",
+          "contexts": [
+            "同一 API Key 被多个环境共用，是 429 报告频繁出现的常见原因，建议按环境拆分 Key。\n\n滑动窗口意味着额度随请求时间推移连续释放，而不是整点重置。",
+            "[行 2] 日期: 2026-09-02；渠道: 工单；问题: 限流报错 429 频繁出现；回答: 同一 API Key 被多个环境共用，建议按环境拆分 Key；处理人: 张敏\n[行 3] 日期: 2026-09-05；渠道: 在线；问题: 额度什么时候恢复；回答: 滑动窗口意味着额度随请求时间推移连续释放，而非整点重置；处理人: 李伟\n[行 4] 日期: 2026-09-11；渠道: 工单；问题: 如何申请提额；回答: 企业版可在控制台自助申请，审批后最长 60 秒内生效；处理人: 张敏\n[行 5] 日期: 2026-09-18；渠道: 电话；问题: 突发流量会被拒绝吗；回答: 允许短时超出到 1.5 倍，持续不超过 10 秒，之后立即拒绝；处理人: 王芳\n[行 6] 日期: 2026-09-24；渠道: 工单；问题: Retry-After 是什么；回答: 响应头里给出最早可重试的秒数；处理人: 李伟",
+            "对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发 20。\n额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头，提示最早可重试的秒数。",
+            "对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发20。额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头。\n\n场景\n\n限额\n\n说明\n\n默认\n\n600 次/分钟\n\n所有租户\n\n突发\n\n900 次/分钟\n\n持续不超过 10 秒\n\n企业版\n\n3000 次/分钟\n\n需申请\n\n3. 幂等\n\n所有写操作接口要求 Idempotency-Key 请求头，重复的 key 在 24小时内返回同一结果，避免网络重试造成重复扣费。4. 错误码\n\n400 参数错误；401 鉴权失败；429 触发限流；500 服务端异常。\n\n429 响应一定会带 Retry-After，单位是秒。",
+            "先切 5% 流量，观察 15 分钟。错误率超过 0.5% 或者 P99 延迟翻倍，立即停止放量。",
+            "节点类型 | QPS 上限 | 说明\nAPI 节点 | 1200 | 8 核 16G\n检索节点 | 800 | 受向量库限制\n索引节点 | 200 | 批量任务用索引重建期间建议先将流量切到只读副本，重建完成后再切换回主节点。\n\n回滚包保留最近三个版本，超过三个版本的包会被自动清理。\n\n注意：回滚后必须核对指标看板，确认错误率回到基线再解除封禁。",
+            "发布前确认三件事：灰度开关已就位、数据库迁移脚本已评审、回滚包已构建。\n任何一项缺失都不应进入发布窗口。",
+            "本文档描述对外接口的限流策略与配额管理，适用于所有开放平台租户。",
+            "API 参考手册\n\n本文档描述开放平台的检索接口与限流约定。",
+            "\"\"\"配额检查与滑动窗口实现。\n\n这个文件用来演示「按函数 / 类切分」：每个函数都有 docstring，\n切分层应当以函数签名 + docstring + 函数体为一个 chunk。\n\"\"\"\nfrom __future__ import annotations\n\nimport math\nimport time\nfrom dataclasses import dataclass\n\n\nDEFAULT_LIMIT = 600\nBURST_FACTOR = 1.5"
+          ],
+          "diagnostics": {
+            "below_threshold": 0,
+            "context_budget": 4000,
+            "context_dropped": 0,
+            "context_tokens": 1335,
+            "context_used": 10,
+            "fused": 16,
+            "hybrid": true,
+            "keyword_candidates": 22,
+            "keyword_top_n": 40,
+            "merged_from_hits": 12,
+            "notes": [],
+            "overflow": 9,
+            "per_document": 3,
+            "rerank_requested": true,
+            "rerank_used": true,
+            "returned": 12,
+            "route_candidates": 47,
+            "subqueries": 1,
+            "threshold": 0.35,
+            "vector_candidates": 25,
+            "vector_kept": 25,
+            "vector_top_n": 80
+          },
+          "expected": {
+            "doc_id": "0b4bd908d4f9",
+            "doc_name": "客服问答记录.csv",
+            "line_end": 6,
+            "line_start": 2
+          },
+          "ground_truth": "同一 API Key 被多个环境共用，建议按环境拆分 Key。",
+          "hit": true,
+          "judge_attempts": [
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 482,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.04,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_tokens": 721,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1203
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 1763,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.13,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_tokens": 2182,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 3945
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 418,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 393,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 730,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 256
+                },
+                "total_tokens": 1148
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 346,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 322,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 730,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 640
+                },
+                "total_tokens": 1076
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 377,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 353,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 730,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 0
+                },
+                "total_tokens": 1107
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 68,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.02,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_tokens": 945,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1013
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 159,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 95,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 1213,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 1152
+                },
+                "total_tokens": 1372
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 405,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 335,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 983,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 896
+                },
+                "total_tokens": 1388
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 80,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.02,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_tokens": 1096,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1176
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 423,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 360,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 963,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 896
+                },
+                "total_tokens": 1386
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 64,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.01,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_cache_hit_tokens": 768,
+                "prompt_tokens": 1013,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1077
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 271,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 204,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 962,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 896
+                },
+                "total_tokens": 1233
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 279,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 226,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 947,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 896
+                },
+                "total_tokens": 1226
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 63,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.01,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_cache_hit_tokens": 768,
+                "prompt_tokens": 919,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 982
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 84,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.02,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_tokens": 1004,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1088
+              }
+            },
+            {
+              "case_ids": [
+                "case-001"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 58,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.01,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_cache_hit_tokens": 1536,
+                "prompt_tokens": 1774,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1832
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 1021,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 631,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 2193,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 0
+                },
+                "total_tokens": 3214
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 243,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 221,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 420,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 256
+                },
+                "total_tokens": 663
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 562,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 527,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 420,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 384
+                },
+                "total_tokens": 982
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 361,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 334,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 420,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 0
+                },
+                "total_tokens": 781
+              }
+            }
+          ],
+          "judge_model": "deepseek-v4-flash",
+          "notices": [],
+          "question": "频繁出现 429 限流报错是怎么回事，怎么处理？",
+          "scores": {
+            "answer_relevancy": 0.8415,
+            "context_precision": 1.0,
+            "context_recall": 1.0,
+            "faithfulness": 0.6471
+          },
+          "top_doc": "产品需求文档.md",
+          "usage": {
+            "actual_model": "deepseek-v4-flash",
+            "actual_provider": "sub-coco",
+            "attempts": [
+              {
+                "finish_reason": "stop",
+                "model": "deepseek-v4-flash",
+                "provider": "sub-coco",
+                "usage": {
+                  "cache_creation_input_tokens": 0,
+                  "cache_read_input_tokens": 0,
+                  "cached_tokens": 0,
+                  "completion_thinking_tokens": 0,
+                  "completion_tokens": 352,
+                  "completion_tokens_details": {
+                    "accepted_prediction_tokens": 0,
+                    "audio_tokens": 0,
+                    "cached_tokens": 0,
+                    "reasoning_tokens": 0,
+                    "rejected_prediction_tokens": 0
+                  },
+                  "credit": 0.02,
+                  "prompt_cache_hit_tokens": 1152,
+                  "prompt_cache_miss_tokens": 175,
+                  "prompt_cache_write_tokens": 0,
+                  "prompt_tokens": 1327,
+                  "prompt_tokens_details": {
+                    "accepted_prediction_tokens": 0,
+                    "audio_tokens": 0,
+                    "cached_tokens": 1152,
+                    "reasoning_tokens": 0,
+                    "rejected_prediction_tokens": 0
+                  },
+                  "total_tokens": 1679
+                }
+              }
+            ],
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cached_tokens": 0,
+            "completion_thinking_tokens": 0,
+            "completion_tokens": 352,
+            "completion_tokens_details": {
+              "accepted_prediction_tokens": 0,
+              "audio_tokens": 0,
+              "cached_tokens": 0,
+              "reasoning_tokens": 0,
+              "rejected_prediction_tokens": 0
+            },
+            "credit": 0.02,
+            "notices": [],
+            "prompt_cache_hit_tokens": 1152,
+            "prompt_cache_miss_tokens": 175,
+            "prompt_cache_write_tokens": 0,
+            "prompt_tokens": 1327,
+            "prompt_tokens_details": {
+              "accepted_prediction_tokens": 0,
+              "audio_tokens": 0,
+              "cached_tokens": 1152,
+              "reasoning_tokens": 0,
+              "rejected_prediction_tokens": 0
+            },
+            "reasoning_chars": 0,
+            "total_tokens": 1679,
+            "usage_known": true
+          }
+        },
+        {
+          "actual_model": "deepseek-v4-flash",
+          "answer": "默认配额上限是 **600**，突发系数是 **1.5**，分别对应 `quota.py` 里的 `DEFAULT_LIMIT = 600` 与 `BURST_FACTOR = 1.5`【片段 2】。",
+          "case_id": "case-002",
+          "contexts": [
+            "突发流量允许短暂超出配额，上限为默认值的 1.5 倍，持续不超过 10 秒。\n超出突发额度后立即拒绝，不做排队。场景 | 限额 | 说明\n默认 | 600 次/分钟 | 所有租户\n突发 | 900 次/分钟 | 持续不超过 10 秒\n企业版 | 3000 次/分钟 | 需申请",
+            "\"\"\"配额检查与滑动窗口实现。\n\n这个文件用来演示「按函数 / 类切分」：每个函数都有 docstring，\n切分层应当以函数签名 + docstring + 函数体为一个 chunk。\n\"\"\"\nfrom __future__ import annotations\n\nimport math\nimport time\nfrom dataclasses import dataclass\n\n\nDEFAULT_LIMIT = 600\nBURST_FACTOR = 1.5",
+            "GET /v1/search 支持 top_k 与 score_threshold 两个参数；score_threshold 低于 0.35的片段默认被丢弃，可通过查询参数覆盖。\n\n返回体里的 score 是余弦相似度，越接近 1 越相关。对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发20。额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头。\n\n场景\n\n限额\n\n说明\n\n默认\n\n600 次/分钟\n\n所有租户\n\n突发\n\n900 次/分钟\n\n持续不超过 10 秒\n\n企业版\n\n3000 次/分钟\n\n需申请\n\n3. 幂等\n\n所有写操作接口要求 Idempotency-Key 请求头，重复的 key 在 24小时内返回同一结果，避免网络重试造成重复扣费。4. 错误码\n\n400 参数错误；401 鉴权失败；429 触发限流；500 服务端异常。\n\n429 响应一定会带 Retry-After，单位是秒。",
+            "@dataclass\nclass QuotaResult:\n    \"\"\"一次配额检查的结果。\"\"\"\n\n    allowed: bool\n    used: int\n    limit: int\n    retry_after: float = 0.0",
+            "class SlidingWindowCounter:\n    \"\"\"按滑动窗口统计请求量。\n\n    用两个相邻窗口的加权求和近似连续释放，避免为每个请求存时间戳。\n    \"\"\"\n\n    def __init__(self, limit: int = DEFAULT_LIMIT, window_seconds: int = 60) -> None:\n        self.limit = limit\n        self.window_seconds = window_seconds\n        self._current = 0\n        self._previous = 0\n        self._window_start = time.time()\n\n    def _rotate(self) -> None:\n        \"\"\"窗口到点后滚动一次。\"\"\"\n        now = time.time()\n        elapsed = now - self._window_start\n        if elapsed >= self.window_seconds:\n            self._previous = self._current\n            self._current = 0\n            self._window_start = now\n\n    def check(self, burst: bool = False) -> QuotaResult:\n        \"\"\"检查并消耗一次配额。\"\"\"\n        self._rotate()\n        effective_limit = math.floor(self.limit * (BURST_FACTOR if burst else 1))\n        if self._current >= effective_limit:\n            return QuotaResult(\n                allowed=False,\n                used=self._current,\n                limit=effective_limit,\n                retry_after=self.window_seconds,\n            )\n        self._current += 1\n        return QuotaResult(allowed=True, used=self._current, limit=effective_limit)",
+            "容量按峰值 QPS 的 1.4 倍预留，单实例上限如下：节点类型 | QPS 上限 | 说明\nAPI 节点 | 1200 | 8 核 16G\n检索节点 | 800 | 受向量库限制\n索引节点 | 200 | 批量任务用",
+            "对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发 20。\n额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头，提示最早可重试的秒数。",
+            "[行 2] 日期: 2026-09-02；渠道: 工单；问题: 限流报错 429 频繁出现；回答: 同一 API Key 被多个环境共用，建议按环境拆分 Key；处理人: 张敏\n[行 3] 日期: 2026-09-05；渠道: 在线；问题: 额度什么时候恢复；回答: 滑动窗口意味着额度随请求时间推移连续释放，而非整点重置；处理人: 李伟\n[行 4] 日期: 2026-09-11；渠道: 工单；问题: 如何申请提额；回答: 企业版可在控制台自助申请，审批后最长 60 秒内生效；处理人: 张敏\n[行 5] 日期: 2026-09-18；渠道: 电话；问题: 突发流量会被拒绝吗；回答: 允许短时超出到 1.5 倍，持续不超过 10 秒，之后立即拒绝；处理人: 王芳\n[行 6] 日期: 2026-09-24；渠道: 工单；问题: Retry-After 是什么；回答: 响应头里给出最早可重试的秒数；处理人: 李伟"
+          ],
+          "diagnostics": {
+            "below_threshold": 0,
+            "context_budget": 4000,
+            "context_dropped": 0,
+            "context_tokens": 1605,
+            "context_used": 8,
+            "fused": 16,
+            "hybrid": true,
+            "keyword_candidates": 24,
+            "keyword_top_n": 40,
+            "merged_from_hits": 12,
+            "notes": [],
+            "overflow": 9,
+            "per_document": 3,
+            "rerank_requested": true,
+            "rerank_used": true,
+            "returned": 12,
+            "route_candidates": 49,
+            "subqueries": 1,
+            "threshold": 0.35,
+            "vector_candidates": 25,
+            "vector_kept": 25,
+            "vector_top_n": 80
+          },
+          "expected": {
+            "doc_id": "ca49ce7db5aa",
+            "doc_name": "quota.py",
+            "line_end": 14,
+            "line_start": 1
+          },
+          "ground_truth": "默认配额上限 DEFAULT_LIMIT 是 600，突发系数 BURST_FACTOR 是 1.5。",
+          "hit": true,
+          "judge_attempts": [
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 1763,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.13,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_tokens": 2182,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 3945
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 418,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 393,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 730,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 256
+                },
+                "total_tokens": 1148
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 346,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 322,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 730,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 640
+                },
+                "total_tokens": 1076
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 377,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 353,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 730,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 0
+                },
+                "total_tokens": 1107
+              }
+            },
+            {
+              "case_ids": [
+                "case-002"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 1250,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 1129,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 438,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 0
+                },
+                "total_tokens": 1688
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 1021,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 631,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 2193,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 0
+                },
+                "total_tokens": 3214
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 243,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 221,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 420,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 256
+                },
+                "total_tokens": 663
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 562,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 527,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 420,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 384
+                },
+                "total_tokens": 982
+              }
+            },
+            {
+              "case_ids": [],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 361,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 334,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 420,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 0
+                },
+                "total_tokens": 781
+              }
+            },
+            {
+              "case_ids": [
+                "case-002"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 473,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 406,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 1030,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 1024
+                },
+                "total_tokens": 1503
+              }
+            },
+            {
+              "case_ids": [
+                "case-002"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 55,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.01,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_cache_hit_tokens": 640,
+                "prompt_tokens": 1017,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1072
+              }
+            },
+            {
+              "case_ids": [
+                "case-002"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 93,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.01,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_cache_hit_tokens": 1024,
+                "prompt_tokens": 1168,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1261
+              }
+            },
+            {
+              "case_ids": [
+                "case-002"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 177,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 99,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 992,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 0
+                },
+                "total_tokens": 1169
+              }
+            },
+            {
+              "case_ids": [
+                "case-002"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 57,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.01,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_cache_hit_tokens": 1024,
+                "prompt_tokens": 1261,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1318
+              }
+            },
+            {
+              "case_ids": [
+                "case-002"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 75,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.01,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_cache_hit_tokens": 640,
+                "prompt_tokens": 983,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1058
+              }
+            },
+            {
+              "case_ids": [
+                "case-002"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "claude_cache_creation_1_h_tokens": 0,
+                "claude_cache_creation_5_m_tokens": 0,
+                "completion_tokens": 92,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": 0,
+                  "image_tokens": 0,
+                  "reasoning_tokens": 0,
+                  "rejected_prediction_tokens": null,
+                  "text_tokens": 0
+                },
+                "credit": 0.01,
+                "input_tokens": 0,
+                "input_tokens_details": null,
+                "output_tokens": 0,
+                "prompt_cache_hit_tokens": 640,
+                "prompt_tokens": 970,
+                "prompt_tokens_details": {
+                  "audio_tokens": 0,
+                  "cached_tokens": 0,
+                  "image_tokens": 0,
+                  "text_tokens": 0
+                },
+                "total_tokens": 1062
+              }
+            },
+            {
+              "case_ids": [
+                "case-002"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 559,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 487,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 1226,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 896
+                },
+                "total_tokens": 1785
+              }
+            },
+            {
+              "case_ids": [
+                "case-002"
+              ],
+              "finish_reasons": [
+                "stop"
+              ],
+              "max_tokens": 8192,
+              "model": "deepseek-v4-flash",
+              "provider": "sub-coco",
+              "usage": {
+                "completion_tokens": 320,
+                "completion_tokens_details": {
+                  "accepted_prediction_tokens": null,
+                  "audio_tokens": null,
+                  "reasoning_tokens": 243,
+                  "rejected_prediction_tokens": null
+                },
+                "prompt_tokens": 2159,
+                "prompt_tokens_details": {
+                  "audio_tokens": null,
+                  "cached_tokens": 0
+                },
+                "total_tokens": 2479
+              }
+            }
+          ],
+          "judge_model": "deepseek-v4-flash",
+          "notices": [],
+          "question": "这个配额检查模块里默认的配额上限和突发系数分别是多少？",
+          "scores": {
+            "answer_relevancy": 0.8077,
+            "context_precision": 1.0,
+            "context_recall": 1.0,
+            "faithfulness": 0.4
+          },
+          "top_doc": "产品需求文档.md",
+          "usage": {
+            "actual_model": "deepseek-v4-flash",
+            "actual_provider": "sub-coco",
+            "attempts": [
+              {
+                "finish_reason": "stop",
+                "model": "deepseek-v4-flash",
+                "provider": "sub-coco",
+                "usage": {
+                  "cache_creation_input_tokens": 0,
+                  "cache_read_input_tokens": 0,
+                  "cached_tokens": 0,
+                  "completion_thinking_tokens": 0,
+                  "completion_tokens": 57,
+                  "completion_tokens_details": {
+                    "accepted_prediction_tokens": 0,
+                    "audio_tokens": 0,
+                    "cached_tokens": 0,
+                    "reasoning_tokens": 0,
+                    "rejected_prediction_tokens": 0
+                  },
+                  "credit": 0.03,
+                  "prompt_cache_hit_tokens": 0,
+                  "prompt_cache_miss_tokens": 1605,
+                  "prompt_cache_write_tokens": 0,
+                  "prompt_tokens": 1605,
+                  "prompt_tokens_details": {
+                    "accepted_prediction_tokens": 0,
+                    "audio_tokens": 0,
+                    "cached_tokens": 0,
+                    "reasoning_tokens": 0,
+                    "rejected_prediction_tokens": 0
+                  },
+                  "total_tokens": 1662
+                }
+              }
+            ],
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "cached_tokens": 0,
+            "completion_thinking_tokens": 0,
+            "completion_tokens": 57,
+            "completion_tokens_details": {
+              "accepted_prediction_tokens": 0,
+              "audio_tokens": 0,
+              "cached_tokens": 0,
+              "reasoning_tokens": 0,
+              "rejected_prediction_tokens": 0
+            },
+            "credit": 0.03,
+            "notices": [],
+            "prompt_cache_hit_tokens": 0,
+            "prompt_cache_miss_tokens": 1605,
+            "prompt_cache_write_tokens": 0,
+            "prompt_tokens": 1605,
+            "prompt_tokens_details": {
+              "accepted_prediction_tokens": 0,
+              "audio_tokens": 0,
+              "cached_tokens": 0,
+              "reasoning_tokens": 0,
+              "rejected_prediction_tokens": 0
+            },
+            "reasoning_chars": 0,
+            "total_tokens": 1662,
+            "usage_known": true
+          }
+        }
+      ],
+      "retrieval": {
+        "avg_contexts": 9.0,
+        "case_count": 2,
+        "empty_answers": 0,
+        "failed_answers": 0,
+        "hit_rate": 1.0
+      },
+      "scores": {
+        "answer_relevancy": 0.8246,
+        "context_precision": 1.0,
+        "context_recall": 1.0,
+        "faithfulness": 0.5235
+      }
+    }
+  ]
+}

@@ -1,0 +1,465 @@
+{
+  "started_at": "2026-10-12T10:39:14.123Z",
+  "simulated_api": false,
+  "fault_source": "Controlled local HTTP 503; actual GLM output and RAGAS scores.",
+  "primary_chat": {
+    "actual_model": "deepseek-v4-flash",
+    "visible_text": "RAG\n回答\n18:39\nhybrid · BM25 + 向量\n重排 开启\n1383 tokens\n5.2 s\n\n本次模型：deepseek-v4-flash\n\n默认限流额度：对外接口按租户维度限流，默认 **每分钟 600 次请求、并发 20**，额度以滑动窗口统计【片段 1】【片段 2】。\n\n超出后：返回 **429**，并附 **Retry-After 响应头**（单位为秒，提示最早可重试的秒数）【片段 1】【片段 2】【片段 4】。\n\n补充：突发流量允许短暂超出到默认值的 **1.5 倍（即 900 次/分钟）**，持续不超过 10 秒，超出突发额度后立即拒绝、不做排队【片段 3】【片段 4】。\n\n语义 25/25\n关键字 25\n融合 16 → 返回 12\ntop 12 · 阈值 0.35\n重排 已生效\n重排分 1.00 → 0.00\n上下文 7 段 · 1191 token\n1\n产品需求文档.md\n·\n行 9-10\n\n产品需求文档 v4.2 › 1. 限流策略 › 1.1 默认额度\n\n对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发 20。 额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头，提示最早可重试的秒数。\n\n1.00\n2\nAPI 参考手册.pdf\n·\n行 5-29\nP1\n\n› 1. 检索接口\n\nGET /v1/search 支持 top_k 与 score_threshold 两个参数；score_threshold 低于 0.35的片段默认被丢弃，可通过查询参数覆盖。 返回体里的 score 是余弦相似度，越接近 1 越相关。对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发20。额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头。 场景 限额 说明 默认 600 次/分钟 所有租户 突发 900 次/分钟 持续不超过 10 秒 企业版 3000 次/分钟 需申请 3. 幂等 所有写操作接口要求 Idempotency-Key 请求头，重复的 key 在 24小时内返回同一结果，避免网络重试造成重复扣费。4. 错误码 400 参数错误；401 鉴权失败；429 触发限流；500 服务端异常。 429 响应一定会带 Retry-After，单位是秒。\n\n1.00\n3\n产品需求文档.md\n·\n行 14-21\n\n产品需求文档 v4.2 › 1. 限流策略 › 1.2 突发流量\n\n突发流量允许短暂超出配额，上限为默认值的 1.5 倍，持续不超过 10 秒。 超出突发额度后立即拒绝，不做排队。场景 | 限额 | 说明 默认 | 600 次/分钟 | 所有租户 突发 | 900 次/分钟 | 持续不超过 10 秒 企业版 | 3000 次/分钟 | 需申请\n\n0.73\n4\n客服问答记录.csv\n·\n行 2-6\n\n表头：日期 | 渠道 | 问题 | 回答 | 处理人\n\n[行 2] 日期: 2026-09-02；渠道: 工单；问题: 限流报错 429 频繁出现；回答: 同一 API Key 被多个环境共用，建议按环境拆分 Key；处理人: 张敏 [行 3] 日期: 2026-09-05；渠道: 在线；问题: 额度什么时候恢复；回答: 滑动窗口意味着额度随请求时间推移连续释放，而非整点重置；处理人: 李伟 [行 4] 日期: 2026-09-11；渠道: 工单；问题: 如何申请提额；回答: 企业版可在控制台自助申请，审批后最长 60 秒内生效；处理人: 张敏 [行 5] 日期: 2026-09-18；渠道: 电话；问题: 突发流量会被拒绝吗；回答: 允许短时超出到 1.5 倍，持续不超过 10 秒，之后立即拒绝；处理人: 王芳 [行 6] 日期: 2026-09-24；渠道: 工单；问题: Retry-After 是什么；回答: 响应头里给出最早可重试的秒数；处理人: 李伟\n\n0.27\n5\n运维 Runbook.docx\n·\n行 7-15\n\n运维 Runbook › 二、容量评估\n\n容量按峰值 QPS 的 1.4 倍预留，单实例上限如下：节点类型 | QPS 上限 | 说明 API 节点 | 1200 | 8 核 16G 检索节点 | 800 | 受向量库限制 索引节点 | 200 | 批量任务用索引重建期间建议先将流量切到只读副本，重建完成后再切换回主节点。 回滚包保留最近三个版本，超过三个版本的包会被自动清理。 注意：回滚后必须核对指标看板，确认错误率回到基线再解除封禁。\n\n0.08\n6\n运维笔记.txt\n·\n行 10-10\n\n二、灰度发布\n\n先切 5% 流量，观察 15 分钟。错误率超过 0.5% 或者 P99 延迟翻倍，立即停止放量。\n\n0.01\n7\n运维笔记.txt\n·\n行 5-6\n\n一、发布前检查\n\n发布前确认三件事：灰度开关已就位、数据库迁移脚本已评审、回滚包已构建。 任何一项缺失都不应进入发布窗口。\n\n0.00"
+  },
+  "fallback_chat": {
+    "actual_model": "glm-4-flash",
+    "visible_text": "RAG\n回答\n18:39\nhybrid · BM25 + 向量\n重排 开启\n最终请求 1458 tokens\n6.3 s\n主模型暂不可用（HTTP 503），已切换至 glm-4-flash，正在重新生成\n\n本次模型：glm-4-flash\n\n默认限流额度：每分钟 600 次请求、并发 20。\n\n超限处理：返回 429 错误码，并附 Retry-After 响应头提示重试时间【片段 1】【片段 2】。\n\n语义 25/25\n关键字 25\n融合 16 → 返回 12\ntop 12 · 阈值 0.35\n重排 已生效\n重排分 0.86 → 0.00\n上下文 7 段 · 1166 token\n1\nAPI 参考手册.pdf\n·\n行 5-29\nP1\n\n› 1. 检索接口\n\nGET /v1/search 支持 top_k 与 score_threshold 两个参数；score_threshold 低于 0.35的片段默认被丢弃，可通过查询参数覆盖。 返回体里的 score 是余弦相似度，越接近 1 越相关。对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发20。额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头。 场景 限额 说明 默认 600 次/分钟 所有租户 突发 900 次/分钟 持续不超过 10 秒 企业版 3000 次/分钟 需申请 3. 幂等 所有写操作接口要求 Idempotency-Key 请求头，重复的 key 在 24小时内返回同一结果，避免网络重试造成重复扣费。4. 错误码 400 参数错误；401 鉴权失败；429 触发限流；500 服务端异常。 429 响应一定会带 Retry-After，单位是秒。\n\n0.86\n2\n产品需求文档.md\n·\n行 9-10\n\n产品需求文档 v4.2 › 1. 限流策略 › 1.1 默认额度\n\n对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发 20。 额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头，提示最早可重试的秒数。\n\n0.83\n3\n产品需求文档.md\n·\n行 14-21\n\n产品需求文档 v4.2 › 1. 限流策略 › 1.2 突发流量\n\n突发流量允许短暂超出配额，上限为默认值的 1.5 倍，持续不超过 10 秒。 超出突发额度后立即拒绝，不做排队。场景 | 限额 | 说明 默认 | 600 次/分钟 | 所有租户 突发 | 900 次/分钟 | 持续不超过 10 秒 企业版 | 3000 次/分钟 | 需申请\n\n0.64\n4\n运维 Runbook.docx\n·\n行 7-15\n\n运维 Runbook › 二、容量评估\n\n容量按峰值 QPS 的 1.4 倍预留，单实例上限如下：节点类型 | QPS 上限 | 说明 API 节点 | 1200 | 8 核 16G 检索节点 | 800 | 受向量库限制 索引节点 | 200 | 批量任务用索引重建期间建议先将流量切到只读副本，重建完成后再切换回主节点。 回滚包保留最近三个版本，超过三个版本的包会被自动清理。 注意：回滚后必须核对指标看板，确认错误率回到基线再解除封禁。\n\n0.12\n5\n客服问答记录.csv\n·\n行 2-6\n\n表头：日期 | 渠道 | 问题 | 回答 | 处理人\n\n[行 2] 日期: 2026-09-02；渠道: 工单；问题: 限流报错 429 频繁出现；回答: 同一 API Key 被多个环境共用，建议按环境拆分 Key；处理人: 张敏 [行 3] 日期: 2026-09-05；渠道: 在线；问题: 额度什么时候恢复；回答: 滑动窗口意味着额度随请求时间推移连续释放，而非整点重置；处理人: 李伟 [行 4] 日期: 2026-09-11；渠道: 工单；问题: 如何申请提额；回答: 企业版可在控制台自助申请，审批后最长 60 秒内生效；处理人: 张敏 [行 5] 日期: 2026-09-18；渠道: 电话；问题: 突发流量会被拒绝吗；回答: 允许短时超出到 1.5 倍，持续不超过 10 秒，之后立即拒绝；处理人: 王芳 [行 6] 日期: 2026-09-24；渠道: 工单；问题: Retry-After 是什么；回答: 响应头里给出最早可重试的秒数；处理人: 李伟\n\n0.08\n6\n运维笔记.txt\n·\n行 10-10\n\n二、灰度发布\n\n先切 5% 流量，观察 15 分钟。错误率超过 0.5% 或者 P99 延迟翻倍，立即停止放量。\n\n0.01\n7\n运维笔记.txt\n·\n行 19-19\n\n四、事后复盘\n\n每次回滚都要写复盘，说明触发原因、影响面、后续动作。\n\n0.00"
+  },
+  "fallback_dataset": {
+    "cases": [
+      {
+        "case_id": "case-001",
+        "expected": {
+          "doc_id": "0b4bd908d4f9",
+          "doc_name": "客服问答记录.csv",
+          "line_end": 6,
+          "line_start": 2
+        },
+        "generation_model": "glm-4-flash",
+        "ground_truth": "限流报错 429 频繁出现",
+        "question": "如果我的API Key被多个环境共用，会出现什么问题？"
+      }
+    ],
+    "count": 1,
+    "notes": [
+      "主模型暂不可用（HTTP 503 (controlled_gateway_unavailable)），已切换至 glm-4-flash，正在重新生成"
+    ],
+    "ok": true,
+    "path": "E:\\Desktop\\rag指标\\backend\\data\\tmp\\live-validation-20261012-181440\\eval\\dataset.json"
+  },
+  "fallback_report": {
+    "created_at": "2026-10-12T10:39:36.907153+00:00",
+    "dataset_count": 1,
+    "notes": [
+      "主模型暂不可用（HTTP 503），已切换至 glm-4-flash，正在重新生成",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+      "部分判分使用了 glm-4-flash",
+      "当前配置：部分判分使用了 GLM（15 次成功）"
+    ],
+    "ok": true,
+    "path": "E:\\Desktop\\rag指标\\backend\\data\\tmp\\live-validation-20261012-181440\\eval\\latest.json",
+    "variants": [
+      {
+        "error": "",
+        "name": "当前配置",
+        "params": {
+          "hybrid": true,
+          "rerank": null
+        },
+        "per_case": [
+          {
+            "actual_model": "glm-4-flash",
+            "answer": "如果API Key被多个环境共用，会出现429报错频繁出现的问题。这是因为同一API Key被多个环境共用，导致请求量超出预设的额度限制，从而触发限流机制，返回429错误。建议按环境拆分Key以避免此类问题【片段 1】【片段 2】。",
+            "case_id": "case-001",
+            "contexts": [
+              "同一 API Key 被多个环境共用，是 429 报告频繁出现的常见原因，建议按环境拆分 Key。\n\n滑动窗口意味着额度随请求时间推移连续释放，而不是整点重置。",
+              "[行 2] 日期: 2026-09-02；渠道: 工单；问题: 限流报错 429 频繁出现；回答: 同一 API Key 被多个环境共用，建议按环境拆分 Key；处理人: 张敏\n[行 3] 日期: 2026-09-05；渠道: 在线；问题: 额度什么时候恢复；回答: 滑动窗口意味着额度随请求时间推移连续释放，而非整点重置；处理人: 李伟\n[行 4] 日期: 2026-09-11；渠道: 工单；问题: 如何申请提额；回答: 企业版可在控制台自助申请，审批后最长 60 秒内生效；处理人: 张敏\n[行 5] 日期: 2026-09-18；渠道: 电话；问题: 突发流量会被拒绝吗；回答: 允许短时超出到 1.5 倍，持续不超过 10 秒，之后立即拒绝；处理人: 王芳\n[行 6] 日期: 2026-09-24；渠道: 工单；问题: Retry-After 是什么；回答: 响应头里给出最早可重试的秒数；处理人: 李伟",
+              "API 参考手册\n\n本文档描述开放平台的检索接口与限流约定。GET /v1/search 支持 top_k 与 score_threshold 两个参数；score_threshold 低于 0.35的片段默认被丢弃，可通过查询参数覆盖。\n\n返回体里的 score 是余弦相似度，越接近 1 越相关。对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发20。额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头。\n\n场景\n\n限额\n\n说明\n\n默认\n\n600 次/分钟\n\n所有租户\n\n突发\n\n900 次/分钟\n\n持续不超过 10 秒\n\n企业版\n\n3000 次/分钟\n\n需申请\n\n3. 幂等\n\n所有写操作接口要求 Idempotency-Key 请求头，重复的 key 在 24小时内返回同一结果，避免网络重试造成重复扣费。",
+              "节点类型 | QPS 上限 | 说明\nAPI 节点 | 1200 | 8 核 16G\n检索节点 | 800 | 受向量库限制\n索引节点 | 200 | 批量任务用索引重建期间建议先将流量切到只读副本，重建完成后再切换回主节点。\n\n回滚包保留最近三个版本，超过三个版本的包会被自动清理。\n\n注意：回滚后必须核对指标看板，确认错误率回到基线再解除封禁。",
+              "索引重建期间建议先将流量切到只读副本，重建完成后再切换回主节点。\n回滚包保留最近三个版本，超过三个版本的包会被自动清理。",
+              "对外接口按租户维度限流，默认额度为每分钟 600 次请求、并发 20。\n额度以滑动窗口统计，超出后返回 429 并附 Retry-After 响应头，提示最早可重试的秒数。",
+              "本文档描述对外接口的限流策略与配额管理，适用于所有开放平台租户。",
+              "\"\"\"配额检查与滑动窗口实现。\n\n这个文件用来演示「按函数 / 类切分」：每个函数都有 docstring，\n切分层应当以函数签名 + docstring + 函数体为一个 chunk。\n\"\"\"\nfrom __future__ import annotations\n\nimport math\nimport time\nfrom dataclasses import dataclass\n\n\nDEFAULT_LIMIT = 600\nBURST_FACTOR = 1.5",
+              "@dataclass\nclass QuotaResult:\n    \"\"\"一次配额检查的结果。\"\"\"\n\n    allowed: bool\n    used: int\n    limit: int\n    retry_after: float = 0.0"
+            ],
+            "diagnostics": {
+              "below_threshold": 0,
+              "context_budget": 4000,
+              "context_dropped": 0,
+              "context_tokens": 1351,
+              "context_used": 9,
+              "fused": 16,
+              "hybrid": true,
+              "keyword_candidates": 17,
+              "keyword_top_n": 40,
+              "merged_from_hits": 12,
+              "notes": [],
+              "overflow": 9,
+              "per_document": 3,
+              "rerank_requested": true,
+              "rerank_used": true,
+              "returned": 12,
+              "route_candidates": 42,
+              "subqueries": 1,
+              "threshold": 0.35,
+              "vector_candidates": 25,
+              "vector_kept": 25,
+              "vector_top_n": 80
+            },
+            "expected": {
+              "doc_id": "0b4bd908d4f9",
+              "doc_name": "客服问答记录.csv",
+              "line_end": 6,
+              "line_start": 2
+            },
+            "ground_truth": "限流报错 429 频繁出现",
+            "hit": true,
+            "judge_attempts": [
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 113,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 416,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 529
+                }
+              },
+              {
+                "case_ids": [],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 390,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 1818,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 2208
+                }
+              },
+              {
+                "case_ids": [],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 37,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 400,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 437
+                }
+              },
+              {
+                "case_ids": [],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 40,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 400,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 440
+                }
+              },
+              {
+                "case_ids": [],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 41,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 400,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 441
+                }
+              },
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 63,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 948,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 1011
+                }
+              },
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 75,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 1195,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 1270
+                }
+              },
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 64,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 1118,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 1182
+                }
+              },
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 70,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 1012,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 1082
+                }
+              },
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 61,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 937,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 998
+                }
+              },
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 83,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 957,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 1040
+                }
+              },
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 68,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 921,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 989
+                }
+              },
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 73,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 992,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 1065
+                }
+              },
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 61,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 951,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 1012
+                }
+              },
+              {
+                "case_ids": [
+                  "case-001"
+                ],
+                "finish_reasons": [
+                  "stop"
+                ],
+                "max_tokens": 8192,
+                "model": "glm-4-flash",
+                "provider": "zhipu",
+                "usage": {
+                  "completion_tokens": 72,
+                  "completion_tokens_details": null,
+                  "prompt_tokens": 1792,
+                  "prompt_tokens_details": null,
+                  "total_tokens": 1864
+                }
+              }
+            ],
+            "judge_model": "glm-4-flash",
+            "notices": [
+              "主模型暂不可用（HTTP 503），已切换至 glm-4-flash，正在重新生成"
+            ],
+            "question": "如果我的API Key被多个环境共用，会出现什么问题？",
+            "scores": {
+              "answer_relevancy": 0.8666,
+              "context_precision": 0.8333,
+              "context_recall": 1,
+              "faithfulness": 0.6667
+            },
+            "top_doc": "产品需求文档.md",
+            "usage": {
+              "actual_model": "glm-4-flash",
+              "actual_provider": "zhipu",
+              "attempts": [
+                {
+                  "error": "HTTP 503",
+                  "finish_reason": null,
+                  "model": "deepseek-v4-flash",
+                  "provider": "sub-coco",
+                  "usage": null
+                },
+                {
+                  "error": "HTTP 503",
+                  "finish_reason": null,
+                  "model": "deepseek-v4-flash",
+                  "provider": "sub-coco",
+                  "usage": null
+                },
+                {
+                  "finish_reason": "stop",
+                  "model": "glm-4-flash",
+                  "provider": "zhipu",
+                  "usage": {
+                    "completion_tokens": 68,
+                    "prompt_tokens": 1335,
+                    "total_tokens": 1403
+                  }
+                }
+              ],
+              "completion_tokens": 68,
+              "notices": [
+                "主模型暂不可用（HTTP 503），已切换至 glm-4-flash，正在重新生成"
+              ],
+              "prompt_tokens": 1335,
+              "reasoning_chars": 0,
+              "total_tokens": 1403,
+              "usage_known": true
+            }
+          }
+        ],
+        "retrieval": {
+          "avg_contexts": 9,
+          "case_count": 1,
+          "empty_answers": 0,
+          "failed_answers": 0,
+          "hit_rate": 1
+        },
+        "scores": {
+          "answer_relevancy": 0.8666,
+          "context_precision": 0.8333,
+          "context_recall": 1,
+          "faithfulness": 0.6667
+        }
+      }
+    ]
+  },
+  "passed": true,
+  "finished_at": "2026-10-12T10:41:30.653Z",
+  "page_errors": []
+}

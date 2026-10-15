@@ -1,0 +1,28 @@
+{
+  "name": "corpus-rag-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "test": "node --test tests/*.test.cjs",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-sdk/vue": "^4.0.136",
+    "ai": "^7.0.136",
+    "dompurify": "^3.4.17",
+    "markdown-it": "^15.0.2",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@types/markdown-it": "^14.2.0",
+    "@types/node": "^22.10.5",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "typescript": "~5.6.3",
+    "vite": "^6.0.7",
+    "vue-tsc": "^2.1.10"
+  }
+}

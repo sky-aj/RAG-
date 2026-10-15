@@ -1,0 +1,36 @@
+# 步骤 1 只装这些就能跑起来；后面每一步的依赖会追加到对应分组
+# --- 步骤 1：骨架 ---
+Flask==3.1.0
+flask-cors==5.0.0
+python-dotenv==1.0.1
+
+# --- 步骤 2：解析（已接入） ---
+pypdf>=6.0.0
+python-docx>=1.1.0
+openpyxl>=3.1.0
+markdown-it-py>=3.0.0
+beautifulsoup4>=4.12.0
+
+# reportlab 仅用于生成测试样例（scripts/make_samples.py），不是运行时依赖
+reportlab>=4.0.0
+
+# --- 步骤 3：代码切分（已接入） ---
+tree-sitter>=0.23.0
+tree-sitter-language-pack>=0.7.0
+
+# --- 步骤 4：向量化与向量库 ---
+# 向量化走硅基流动的 BAAI/bge-m3（OpenAI 兼容接口），不在本机跑推理，
+# 所以不需要 sentence-transformers / torch，也不需要下载权重。
+httpx>=0.27.0            # 调硅基流动用（步骤 5 的智谱也复用）
+qdrant-client>=1.12.0
+numpy>=1.26.0
+
+# --- 步骤 5：混合检索与生成 ---
+jieba>=0.42.1
+rank-bm25>=0.2.2
+openai>=1.55.0            # 智谱 AI 的 OpenAI 兼容接口
+
+# --- 步骤 6：评测与追踪 ---
+ragas>=0.2.6
+datasets>=3.1.0
+langsmith>=0.1.140

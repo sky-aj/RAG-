@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="minimalist" data-accent="ink">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CORPUS · RAG 控制台</title>
+<meta name="description" content="知识库检索与对话工作台">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<svg class="sprite" aria-hidden="true"><defs>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M3 10h12M10.5 5l5 5-5 5"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 20 20"><path d="M13.5 6.5 8 12a2.1 2.1 0 0 0 3 3l5.5-5.5a4 4 0 0 0-5.7-5.7L5 9.6a5.5 5.5 0 0 0 7.8 7.8l4-4"/></symbol>
+  <symbol id="i-close" viewBox="0 0 20 20"><path d="M5.5 5.5l9 9m0-9-9 9"/></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><path d="M4.5 10.5l3.5 3.5 7.5-8"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 20 20"><path d="M5 2.75h6.5L16 7.25V17a.25.25 0 0 1-.25.25H5A.25.25 0 0 1 4.75 17V3A.25.25 0 0 1 5 2.75Z"/><path d="M11.25 2.9V7.2h4.4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 20 20"><path d="M10 4.5v11M4.5 10h11"/></symbol>
+  <symbol id="i-search" viewBox="0 0 20 20"><circle cx="9" cy="9" r="5.25"/><path d="M12.9 12.9 17 17"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 20 20"><path d="M4 6.5h12M4 13.5h12"/><circle cx="8" cy="6.5" r="1.6"/><circle cx="13" cy="13.5" r="1.6"/></symbol>
+</defs></svg>
+
+<div class="ambient" aria-hidden="true">
+  <span class="blob blob-a"></span>
+  <span class="blob blob-b"></span>
+  <span class="grid-lines"></span>
+  <span class="grain"></span>
+</div>
+
+<div class="app">
+
+  <aside class="rail" aria-label="主导航">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">C</span>
+      <span class="brand-text">
+        <strong>CORPUS</strong>
+        <small>RAG 控制台 · v0.1</small>
+      </span>
+    </div>
+
+    <nav class="nav" role="tablist" aria-label="视图">
+      <button class="nav-item is-active" role="tab" aria-selected="true" data-view="chat">对话</button>
+      <button class="nav-item" role="tab" aria-selected="false" data-view="kb">知识库</button>
+    </nav>
+
+    <section class="rail-block">
+      <header class="rail-label"><span>会话</span><button class="micro-btn" id="newThread" type="button" title="新建会话"><svg class="ico"><use href="#i-plus"></use></svg></button></header>
+      <ul class="thread-list" id="threadList"></ul>
+    </section>
+
+    <section class="rail-block rail-block--grow">
+      <header class="rail-label"><span>知识库</span></header>
+      <ul class="kb-list" id="kbList"></ul>
+    </section>
+
+    <div class="rail-foot">
+      <dl class="engine">
+        <div><dt>嵌入模型</dt><dd>text-embedding-3-large</dd></div>
+        <div><dt>生成模型</dt><dd>gpt-4o-mini</dd></div>
+      </dl>
+      <button class="ghost-btn" id="openStyle" type="button">
+        <svg class="ico"><use href="#i-sliders"></use></svg>外观与配色
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <header class="topbar">
+      <div class="crumbs">
+        <span class="crumb-muted" id="crumbRoot">工作台</span>
+        <span class="crumb-sep" aria-hidden="true">/</span>
+        <strong id="crumbView">对话</strong>
+      </div>
+      <div class="topbar-actions">
+        <button class="ghost-btn" id="topUpload" type="button"><svg class="ico"><use href="#i-clip"></use></svg>上传文件</button>
+        <button class="solid-btn" id="topAsk" type="button">新建提问</button>
+      </div>
+    </header>
+
+    <div class="scroll" id="scroll">
+
+      <section class="view view--chat is-active" id="view-chat" role="tabpanel" aria-label="对话">
+        <div class="chat-head">
+          <div>
+            <h1 class="page-title" id="chatTitle">产品文档问答</h1>
+            <p class="page-sub">检索当前所选知识库，回答附带引用片段与相似度分数。</p>
+          </div>
+          <div class="retrieval-panel">
+            <button class="field-toggle" id="retrievalToggle" type="button" aria-expanded="false">
+              <svg class="ico"><use href="#i-sliders"></use></svg><span>检索参数</span><span class="chip" id="retrievalSummary">top 5 · 0.35</span>
+            </button>
+            <div class="field-pop" id="retrievalPop" hidden>
+              <label class="field"><span>召回条数 top-k</span><input type="range" id="paramTopK" min="1" max="12" value="5"><output id="outTopK">5</output></label>
+              <label class="field"><span>相似度阈值</span><input type="range" id="paramScore" min="0" max="0.9" step="0.05" value="0.35"><output id="outScore">0.35</output></label>
+              <label class="field field--row"><span>重排序 rerank</span><input type="checkbox" id="paramRerank"></label>
+              <label class="field field--row"><span>混合检索 BM25 + 向量</span><input type="checkbox" id="paramHybrid" checked></label>
+            </div>
+          </div>
+        </div>
+
+        <ol class="messages" id="messages"></ol>
+        <div class="messages-end" id="messagesEnd" aria-hidden="true"></div>
+      </section>
+
+      <section class="view view--kb" id="view-kb" role="tabpanel" aria-label="知识库" hidden>
+        <div class="kb-head">
+          <div>
+            <h1 class="page-title">知识库</h1>
+            <p class="page-sub">文档解析、分块与索引状态。上传文件后进入解析流水线。</p>
+          </div>
+          <button class="solid-btn" id="kbUpload" type="button"><svg class="ico"><use href="#i-clip"></use></svg>上传文件</button>
+        </div>
+
+        <div class="stats" id="stats"></div>
+
+        <div class="kb-grid">
+          <section class="panel panel--docs">
+            <header class="panel-head"><h2>文档</h2><span class="panel-meta" id="docsMeta"></span></header>
+            <div class="dropzone" id="dropzone" tabindex="0">
+              <svg class="ico ico--lg"><use href="#i-clip"></use></svg>
+              <p>把文件拖到这里，或点击选择</p>
+              <small>支持 PDF / DOCX / MD / TXT / CSV，单文件上限 50 MB</small>
+            </div>
+            <div class="table-wrap">
+              <table class="table">
+                <thead><tr><th>名称</th><th>类型</th><th class="num">分块</th><th>状态</th><th>更新</th></tr></thead>
+                <tbody id="docRows"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="panel panel--chunks">
+            <header class="panel-head"><h2>分块检查</h2><span class="panel-meta" id="chunkMeta"></span></header>
+            <div class="chunk-box" id="chunkBox"></div>
+            <header class="panel-head panel-head--sub"><h2>检索测试</h2></header>
+            <form class="search-row" id="searchForm">
+              <svg class="ico"><use href="#i-search"></use></svg>
+              <input id="searchInput" type="text" placeholder="输入查询，查看命中的分块与分数" autocomplete="off">
+              <button class="solid-btn solid-btn--sm" type="submit">检索</button>
+            </form>
+            <ol class="hits" id="hits"></ol>
+          </section>
+        </div>
+      </section>
+
+    </div>
+
+    <form class="composer" id="composer">
+      <div class="attach-row" id="attachRow"></div>
+      <div class="composer-shell">
+        <textarea id="prompt" rows="1" placeholder="向知识库提问，Enter 发送，Shift + Enter 换行" aria-label="提问内容"></textarea>
+        <div class="composer-tools">
+          <button class="icon-btn" id="attachBtn" type="button" title="添加文件"><svg class="ico"><use href="#i-clip"></use></svg></button>
+          <label class="mini-switch"><input type="checkbox" id="grounding" checked><span>引用知识库</span></label>
+          <span class="composer-hint" id="composerHint">3 份文档已索引</span>
+          <button class="send-btn" type="submit" id="sendBtn"><svg class="ico"><use href="#i-send"></use></svg><span>发送</span></button>
+        </div>
+      </div>
+    </form>
+  </main>
+</div>
+
+<input type="file" id="fileInput" multiple hidden accept=".pdf,.docx,.md,.txt,.csv,.json">
+
+<div class="scrim" id="scrim" hidden></div>
+
+<aside class="drawer" id="styleDrawer" aria-modal="true" role="dialog" aria-label="外观与配色" hidden>
+  <header class="drawer-head">
+    <div>
+      <h2>外观与配色</h2>
+      <p>四种设计语言取自本地 skills 规范；配色随你切换。</p>
+    </div>
+    <button class="icon-btn" id="closeStyle" type="button" aria-label="关闭"><svg class="ico"><use href="#i-close"></use></svg></button>
+  </header>
+
+  <div class="drawer-body">
+    <section class="drawer-section">
+      <h3>设计语言</h3>
+      <div class="theme-grid" id="themeGrid"></div>
+    </section>
+
+    <section class="drawer-section">
+      <h3>强调色</h3>
+      <div class="swatches" id="swatches"></div>
+    </section>
+
+    <section class="drawer-section">
+      <h3>当前令牌</h3>
+      <dl class="token-list" id="tokenList"></dl>
+    </section>
+  </div>
+
+  <footer class="drawer-foot">
+    <button class="ghost-btn" id="resetStyle" type="button">恢复默认</button>
+    <button class="solid-btn" id="doneStyle" type="button">完成</button>
+  </footer>
+</aside>
+
+<script src="app.js"></script>
+</body>
+</html>

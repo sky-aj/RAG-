@@ -1,0 +1,49 @@
+{
+  "fake_models": true,
+  "real_flask_qdrant": true,
+  "scenarios": [
+    "create labels, retain empty labels and restore after reload",
+    "upload and index scoped documents with identical filenames",
+    "Markdown formatting, safe content, folded snippets and citation navigation",
+    "outside click and Escape close parameters, controls stay interactive",
+    "history deduplicates per thread, recall never sends, ordinary mode persists",
+    "fallback notices and actual model retained in new rendering",
+    "compact citation geometry and page width across all four themes",
+    "chat scrolls inside the workspace with a visible composer",
+    "scoped clear preserves other vectors; vector search snippets start folded",
+    "moving document retains vectors and updates classification",
+    "rename and delete empty classification"
+  ],
+  "requests": [
+    {
+      "question": "介绍教育与培训用途",
+      "kb_id": "kb-cfb528263123444d91760a9a04454a26",
+      "use_knowledge_base": true,
+      "history_count": 0
+    },
+    {
+      "question": "介绍教育与培训用途",
+      "kb_id": "kb-cfb528263123444d91760a9a04454a26",
+      "use_knowledge_base": true,
+      "history_count": 2
+    },
+    {
+      "question": "你好普通问答",
+      "kb_id": "all",
+      "use_knowledge_base": false,
+      "history_count": 0
+    },
+    {
+      "question": "回退通知验证",
+      "kb_id": "kb-cfb528263123444d91760a9a04454a26",
+      "use_knowledge_base": true,
+      "history_count": 4
+    }
+  ],
+  "status": {
+    "fake_models": true,
+    "isolated": true,
+    "points": 1,
+    "scratch": "E:\\Desktop\\rag指标\\backend\\data\\tmp\\revise-ui-20261013-b0aa03b9"
+  }
+}

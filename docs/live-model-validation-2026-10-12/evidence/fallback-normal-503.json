@@ -1,0 +1,41 @@
+{
+  "at": "2026-10-12T10:17:57.945498+00:00",
+  "seconds": 2.86,
+  "actual_model": "glm-4-flash",
+  "usage": {
+    "completion_tokens": 5,
+    "prompt_tokens": 11,
+    "total_tokens": 16
+  },
+  "notices": [
+    {
+      "type": "notice",
+      "reason": "HTTP 503 (controlled_gateway_unavailable)",
+      "target_model": "glm-4-flash",
+      "text": "主模型暂不可用（HTTP 503 (controlled_gateway_unavailable)），已切换至 glm-4-flash，正在重新生成"
+    }
+  ],
+  "attempts": [
+    {
+      "model": "deepseek-v4-flash",
+      "provider": "sub-coco",
+      "error": "HTTP 503 (controlled_gateway_unavailable)"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "provider": "sub-coco",
+      "error": "HTTP 503 (controlled_gateway_unavailable)"
+    },
+    {
+      "model": "glm-4-flash",
+      "provider": "zhipu",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 5,
+        "prompt_tokens": 11,
+        "total_tokens": 16
+      }
+    }
+  ],
+  "fault_source": "controlled local HTTP fault; real GLM request"
+}

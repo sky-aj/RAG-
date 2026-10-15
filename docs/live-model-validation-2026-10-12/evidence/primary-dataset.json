@@ -1,0 +1,31 @@
+{
+  "at": "2026-10-12T10:20:20.204917+00:00",
+  "count": 2,
+  "cases": [
+    {
+      "case_id": "case-001",
+      "expected": {
+        "doc_id": "0b4bd908d4f9",
+        "doc_name": "客服问答记录.csv",
+        "line_end": 6,
+        "line_start": 2
+      },
+      "generation_model": "deepseek-v4-flash",
+      "ground_truth": "同一 API Key 被多个环境共用，建议按环境拆分 Key。",
+      "question": "频繁出现 429 限流报错是怎么回事，怎么处理？"
+    },
+    {
+      "case_id": "case-002",
+      "expected": {
+        "doc_id": "ca49ce7db5aa",
+        "doc_name": "quota.py",
+        "line_end": 14,
+        "line_start": 1
+      },
+      "generation_model": "deepseek-v4-flash",
+      "ground_truth": "默认配额上限 DEFAULT_LIMIT 是 600，突发系数 BURST_FACTOR 是 1.5。",
+      "question": "这个配额检查模块里默认的配额上限和突发系数分别是多少？"
+    }
+  ],
+  "notes": []
+}

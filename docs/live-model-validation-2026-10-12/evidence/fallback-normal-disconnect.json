@@ -1,0 +1,41 @@
+{
+  "at": "2026-10-12T10:18:03.930064+00:00",
+  "seconds": 2.7,
+  "actual_model": "glm-4-flash",
+  "usage": {
+    "completion_tokens": 5,
+    "prompt_tokens": 11,
+    "total_tokens": 16
+  },
+  "notices": [
+    {
+      "type": "notice",
+      "reason": "RemoteProtocolError",
+      "target_model": "glm-4-flash",
+      "text": "主模型暂不可用（RemoteProtocolError），已切换至 glm-4-flash，正在重新生成"
+    }
+  ],
+  "attempts": [
+    {
+      "model": "deepseek-v4-flash",
+      "provider": "sub-coco",
+      "error": "RemoteProtocolError"
+    },
+    {
+      "model": "deepseek-v4-flash",
+      "provider": "sub-coco",
+      "error": "RemoteProtocolError"
+    },
+    {
+      "model": "glm-4-flash",
+      "provider": "zhipu",
+      "finish_reason": "stop",
+      "usage": {
+        "completion_tokens": 5,
+        "prompt_tokens": 11,
+        "total_tokens": 16
+      }
+    }
+  ],
+  "fault_source": "controlled local HTTP fault; real GLM request"
+}

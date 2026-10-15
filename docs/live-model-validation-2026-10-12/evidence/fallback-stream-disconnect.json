@@ -1,0 +1,59 @@
+{
+  "at": "2026-10-12T10:18:06.960396+00:00",
+  "characters": 6,
+  "excerpt": "备用连接可用",
+  "sequence": [
+    "notice",
+    "content",
+    "done"
+  ],
+  "done_count": 1,
+  "error_count": 0,
+  "notices": [
+    {
+      "type": "notice",
+      "reason": "流式连接中断",
+      "target_model": "glm-4-flash",
+      "text": "主模型暂不可用（流式连接中断），已切换至 glm-4-flash，正在重新生成"
+    }
+  ],
+  "terminal": [
+    {
+      "type": "done",
+      "finish_reason": "stop",
+      "usage": {
+        "prompt_tokens": 11,
+        "completion_tokens": 5,
+        "total_tokens": 16
+      },
+      "attempts": [
+        {
+          "model": "deepseek-v4-flash",
+          "provider": "sub-coco",
+          "usage": null,
+          "finish_reason": null,
+          "error": "RemoteProtocolError"
+        },
+        {
+          "model": "deepseek-v4-flash",
+          "provider": "sub-coco",
+          "usage": null,
+          "finish_reason": null,
+          "error": "RemoteProtocolError"
+        },
+        {
+          "model": "glm-4-flash",
+          "provider": "zhipu",
+          "usage": {
+            "prompt_tokens": 11,
+            "completion_tokens": 5,
+            "total_tokens": 16
+          },
+          "finish_reason": "stop"
+        }
+      ],
+      "actual_model": "glm-4-flash",
+      "actual_provider": "zhipu"
+    }
+  ]
+}

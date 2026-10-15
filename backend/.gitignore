@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+data/qdrant/
+data/uploads/
+data/eval/
+data/documents.json
+data/index_state.json
+data/tmp/

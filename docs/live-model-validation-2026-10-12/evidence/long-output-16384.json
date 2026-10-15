@@ -1,0 +1,46 @@
+{
+  "at": "2026-10-12T10:15:42.094704+00:00",
+  "requested_budget": 16384,
+  "seconds": 57.45,
+  "characters": 62707,
+  "reasoning_characters": 3568,
+  "lines": 859,
+  "terminal": {
+    "type": "done",
+    "finish_reason": "length",
+    "usage": {
+      "completion_tokens": 16384,
+      "prompt_tokens": 124,
+      "total_tokens": 16508,
+      "prompt_tokens_details": {
+        "cached_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 922
+      }
+    },
+    "attempts": [
+      {
+        "model": "deepseek-v4-flash",
+        "provider": "sub-coco",
+        "usage": {
+          "completion_tokens": 16384,
+          "prompt_tokens": 124,
+          "total_tokens": 16508,
+          "prompt_tokens_details": {
+            "cached_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 922
+          }
+        },
+        "finish_reason": "length"
+      }
+    ],
+    "actual_model": "deepseek-v4-flash",
+    "actual_provider": "sub-coco"
+  },
+  "local_stop": null,
+  "output_path": "E:\\Desktop\\rag指标\\backend\\data\\tmp\\live-validation-20261012-181440\\long-output-16384.txt",
+  "full_capability_proven": false
+}

@@ -1,0 +1,16 @@
+{
+  "status": "ok",
+  "model": "deepseek-v4-flash",
+  "provider": "sub-coco",
+  "llm_configured": true,
+  "fallback_configured": true,
+  "frontend_http_status": 200,
+  "chat_budget": 8192,
+  "registered_documents": 6,
+  "index_total_points": 56,
+  "production_hashes": {
+    "documents.json": "be446efb00266d4578e355515c28f413de6777ea80b2dd969639f60071acc9c5",
+    "index_state.json": "676d714854babacbd722464368822513904fe49368d7003d6c64633adf08286e",
+    "eval/latest.json": "1510b6bc932efedf58d22c1ca9c22ccd31348cd74c8e64de082fe0d6f1da0555"
+  }
+}

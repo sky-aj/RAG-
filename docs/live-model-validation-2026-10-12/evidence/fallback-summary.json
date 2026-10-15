@@ -1,0 +1,42 @@
+{
+  "at": "2026-10-12T10:27:41.025225+00:00",
+  "text": "默认访问频率限制，超限返回429及重试时间",
+  "notices": [
+    {
+      "type": "notice",
+      "reason": "HTTP 503 (controlled_gateway_unavailable)",
+      "target_model": "glm-4-flash",
+      "text": "主模型暂不可用（HTTP 503 (controlled_gateway_unavailable)），已切换至 glm-4-flash，正在重新生成"
+    }
+  ],
+  "gateway_calls": [
+    {
+      "mode": "503",
+      "model": "deepseek-v4-flash",
+      "max_tokens": 2048,
+      "stream": false,
+      "status": 503
+    },
+    {
+      "mode": "503",
+      "model": "deepseek-v4-flash",
+      "max_tokens": 2048,
+      "stream": false,
+      "status": 503
+    },
+    {
+      "mode": "503",
+      "model": "deepseek-v4-flash",
+      "max_tokens": 1024,
+      "stream": false,
+      "status": 503
+    },
+    {
+      "mode": "503",
+      "model": "deepseek-v4-flash",
+      "max_tokens": 1024,
+      "stream": false,
+      "status": 503
+    }
+  ]
+}

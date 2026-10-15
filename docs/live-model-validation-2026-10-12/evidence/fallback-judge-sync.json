@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-12T10:18:17.815993+00:00",
+  "has_content": true,
+  "notices": [
+    "DeepSeek 裁判暂不可用，已尝试切换至 glm-4-flash",
+    "部分判分使用了 glm-4-flash"
+  ],
+  "model": "glm-4-flash",
+  "usage": {
+    "completion_tokens": 11,
+    "prompt_tokens": 14,
+    "total_tokens": 25,
+    "completion_tokens_details": null,
+    "prompt_tokens_details": null
+  }
+}
